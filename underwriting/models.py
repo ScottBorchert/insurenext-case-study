@@ -19,6 +19,27 @@ class Company(models.Model):
         return self.legal_name
 
 
+class Coverage(models.Model):
+    code = models.CharField(
+        max_length=50,
+        unique=True,
+    )
+
+    name = models.CharField(
+        max_length=255,
+    )
+
+    description = models.TextField(
+        blank=True,
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+    )
+
+    def __str__(self) -> str:
+        return f"{self.code.upper()} - {self.name}"
+
 class RatingEngineVersion(models.Model):
     version = models.PositiveIntegerField(unique=True)
     effective_date = models.DateField()
@@ -125,7 +146,11 @@ class ApplicationCoverage(models.Model):
         related_name="coverages",
     )
 
-    coverage_id = models.CharField(max_length=50)
+    coverage = models.ForeignKey(
+        Coverage,
+        on_delete=models.PROTECT,
+        related_name="application_coverages",
+    )
 
     computed_premium = models.DecimalField(
         max_digits=12,
@@ -151,10 +176,10 @@ class ApplicationCoverage(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["application", "coverage_id"],
+                fields=["application", "coverage"],
                 name="unique_coverage_per_application",
             )
         ]
 
     def __str__(self) -> str:
-        return f"Application {self.application_id}: {self.coverage_id}"
+        return f"Application {self.application_id}: {self.coverage.code}"

@@ -51,12 +51,14 @@ def build_rating_request(application: Application) -> dict:
 
     coverages = []
 
-    for coverage in application.coverages.all():
+    for application_coverage in application.coverages.select_related(
+        "coverage"
+    ):
         coverages.append(
             {
-                "code": coverage.coverage_id,
-                "limit": float(coverage.limit),
-                "deductible": float(coverage.deductible),
+                "code": application_coverage.coverage.code,
+                "limit": float(application_coverage.limit),
+                "deductible": float(application_coverage.deductible),
                 "underwriter_discounts": (
                     underwriter_discounts.copy()
                 ),
@@ -123,16 +125,12 @@ def rate_application(application: Application) -> dict:
         for result in response_payload["coverages"]
     }
 
-    for coverage in application.coverages.all():
-        response = responses_by_code[coverage.coverage_id]
+    for application_coverage in application.coverages.select_related("coverage"):
+        response = responses_by_code[application_coverage.coverage.code]
 
-        coverage.computed_premium = Decimal(
-            str(response["premium"])
-        )
-
-        coverage.rating_engine_response = response
-
-        coverage.save(
+        application_coverage.computed_premium = Decimal(str(response["premium"]))
+        application_coverage.rating_engine_response = response
+        application_coverage.save(
             update_fields=[
                 "computed_premium",
                 "rating_engine_response",

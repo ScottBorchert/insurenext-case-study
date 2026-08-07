@@ -8,6 +8,11 @@ app_name = "underwriting"
 
 urlpatterns = [
     path(
+        "",
+        views.home,
+        name="home",
+    ),
+    path(
         "applications/new/",
         views.application_new,
         name="application_new",

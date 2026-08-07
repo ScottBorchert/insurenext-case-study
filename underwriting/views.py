@@ -359,6 +359,11 @@ def _save_discounts(
 # =========================================================
 # 1. Start Application
 # =========================================================
+def home(request):
+    return render(
+        request,
+        "underwriting/home.html",
+    )
 
 
 def application_new(request):

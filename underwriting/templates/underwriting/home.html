@@ -1,0 +1,304 @@
+{% extends "underwriting/base.html" %}
+
+{% block title %}
+InsureNext Case Study
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .hero {
+        padding: 54px 48px;
+        background: linear-gradient(
+            135deg,
+            #172033 0%,
+            #243b68 100%
+        );
+        color: white;
+        border-radius: 5px;
+        margin-bottom: 24px;
+    }
+
+    .hero-kicker {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: #93c5fd;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .hero h1 {
+        max-width: 760px;
+        font-size: 38px;
+        line-height: 1.15;
+        color: white;
+        margin-bottom: 16px;
+    }
+
+    .hero p {
+        max-width: 720px;
+        color: #dbe5f5;
+        font-size: 17px;
+        margin-bottom: 28px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .hero .secondary {
+        background: transparent;
+        border-color: rgba(255, 255, 255, .35);
+        color: white;
+    }
+
+    .home-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .home-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 22px;
+    }
+
+    .home-number {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .home-card h2 {
+        margin-bottom: 8px;
+    }
+
+    .home-card p {
+        color: var(--text-muted);
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+
+    .solution {
+        padding: 26px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+    }
+
+    .solution-title {
+        margin-bottom: 18px;
+    }
+
+    .solution-flow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .solution-box {
+        padding: 11px 14px;
+        background: var(--surface-soft);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .solution-box.highlight {
+        background: var(--green-soft);
+        color: var(--green);
+        border-color: #a6f4c5;
+    }
+
+    .arrow {
+        color: var(--text-light);
+    }
+
+    @media (max-width: 800px) {
+        .hero {
+            padding: 36px 24px;
+        }
+
+        .hero h1 {
+            font-size: 30px;
+        }
+
+        .home-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<section class="hero">
+
+    <div class="hero-kicker">
+        Engineering Case Study
+    </div>
+
+    <h1>
+        Flexible partner insurance programs
+        without rebuilding the core platform.
+    </h1>
+
+    <p>
+        This prototype adds an optional program configuration
+        layer for partner-specific questions, rating inputs,
+        and discounts while preserving the existing
+        application and rating-engine workflow.
+    </p>
+
+    <div class="hero-actions">
+
+        <a
+            href="{% url 'underwriting:application_new' %}"
+            class="button primary">
+
+            Start an Application
+
+        </a>
+
+        <a
+            href="{% url 'underwriting:underwriting_queue' %}"
+            class="button secondary">
+
+            Open Underwriting Queue
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<div class="home-grid">
+
+    <div class="home-card">
+
+        <div class="home-number">
+            1
+        </div>
+
+        <h2>
+            Start an Application
+        </h2>
+
+        <p>
+            Choose a standard application or a partner
+            program such as Acme Pest Control.
+        </p>
+
+    </div>
+
+
+    <div class="home-card">
+
+        <div class="home-number">
+            2
+        </div>
+
+        <h2>
+            Submit for Review
+        </h2>
+
+        <p>
+            Partner question wording and defaults are
+            resolved automatically by Django.
+        </p>
+
+    </div>
+
+
+    <div class="home-card">
+
+        <div class="home-number">
+            3
+        </div>
+
+        <h2>
+            Rate the Application
+        </h2>
+
+        <p>
+            The underwriter applies discounts and sends
+            the backward-compatible request to the rater.
+        </p>
+
+    </div>
+
+</div>
+
+
+<section class="solution">
+
+    <div class="solution-title">
+
+        <div class="page-eyebrow">
+            Architecture
+        </div>
+
+        <h2>
+            What changed?
+        </h2>
+
+    </div>
+
+    <div class="solution-flow">
+
+        <div class="solution-box">
+            Existing Application
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div class="solution-box highlight">
+            Optional ProgramVersion
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div class="solution-box">
+            Question Config
+        </div>
+
+        <div class="solution-box">
+            Rating Config
+        </div>
+
+        <div class="solution-box">
+            Discount Config
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div class="solution-box">
+            Existing Rating Engine
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

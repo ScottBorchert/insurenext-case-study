@@ -1,0 +1,243 @@
+{% extends "underwriting/base.html" %}
+
+{% block title %}
+Underwriting Review
+{% endblock %}
+
+{% block content %}
+
+
+<div class="card">
+
+    <h1>
+        Underwriting Review
+    </h1>
+
+    <p>
+        <strong>Application:</strong>
+        #{{ application.id }}
+    </p>
+
+    <p>
+        <strong>Company:</strong>
+        {{ application.company.legal_name }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        <span class="status">
+            {{ application.status }}
+        </span>
+    </p>
+
+    <p>
+        <strong>Program:</strong>
+
+        {% if application.program_version %}
+            <span class="program">
+                {{ application.program_version }}
+            </span>
+        {% else %}
+            Standard Application
+        {% endif %}
+    </p>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Applicant Answers</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Key</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for question in questions %}
+
+            <tr>
+                <td>
+                    {{ question.question_text }}
+                </td>
+
+                <td>
+                    {{ question.key }}
+                </td>
+
+                <td>
+                    {{ question.answer|default:"-" }}
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Requested Coverages</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Coverage</th>
+                <th>Limit</th>
+                <th>Deductible</th>
+                <th>Premium</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for item in application_coverages %}
+
+            <tr>
+
+                <td>
+                    {{ item.coverage.name }}
+                </td>
+
+                <td class="money">
+                    ${{ item.limit }}
+                </td>
+
+                <td class="money">
+                    ${{ item.deductible }}
+                </td>
+
+                <td class="money">
+                    {% if item.computed_premium %}
+                        ${{ item.computed_premium }}
+                    {% else %}
+                        Not rated
+                    {% endif %}
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Underwriter Discounts</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for row in discount_rows %}
+
+            <div class="field">
+
+                <label
+                    for="discount_{{ row.question.id }}">
+
+                    {{ row.name }}
+
+                </label>
+
+                {% if row.description %}
+                    <div class="help">
+                        {{ row.description }}
+                    </div>
+                {% endif %}
+
+                <div class="help">
+
+                    Rating key:
+                    {{ row.question.rating_engine_question_key }}
+
+                    {% if row.minimum_value != None %}
+                        · Min {{ row.minimum_value }}
+                    {% endif %}
+
+                    {% if row.maximum_value != None %}
+                        · Max {{ row.maximum_value }}
+                    {% endif %}
+
+                    {% if row.requires_approval %}
+                        · Approval required
+                    {% endif %}
+
+                </div>
+
+                <input
+                    id="discount_{{ row.question.id }}"
+                    name="discount_{{ row.question.id }}"
+                    value="{{ row.current_value }}"
+                    {% if not can_rate %}readonly{% endif %}
+                >
+
+            </div>
+
+        {% endfor %}
+
+
+        {% if can_rate %}
+
+            <div class="button-row">
+
+                <button
+                    type="submit"
+                    name="action"
+                    value="save_discounts"
+                    class="button secondary">
+
+                    Save Discounts
+
+                </button>
+
+                <button
+                    type="submit"
+                    name="action"
+                    value="rate"
+                    class="button success">
+
+                    Rate Application
+
+                </button>
+
+            </div>
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Rating Engine Request Preview</h2>
+
+    <p class="help">
+        This is the request Django will send to the
+        rating engine.
+    </p>
+
+    <pre>{{ rating_request_preview }}</pre>
+
+</div>
+
+
+{% endblock %}

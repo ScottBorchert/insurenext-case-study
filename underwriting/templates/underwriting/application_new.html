@@ -1,0 +1,83 @@
+{% extends "underwriting/base.html" %}
+
+{% block title %}
+Start Application
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Start an Application</h1>
+
+    <p>
+        Select the insured company and optionally
+        choose a partner program.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="field">
+            <label for="company_id">
+                Company
+            </label>
+
+            <select
+                id="company_id"
+                name="company_id"
+                required>
+
+                <option value="">
+                    Select a company
+                </option>
+
+                {% for company in companies %}
+                    <option value="{{ company.id }}">
+                        {{ company.legal_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="program_version_id">
+                Partner Program
+            </label>
+
+            <select
+                id="program_version_id"
+                name="program_version_id">
+
+                <option value="">
+                    Standard Application
+                </option>
+
+                {% for version in program_versions %}
+                    <option value="{{ version.id }}">
+                        {{ version.program.distribution_partner.name }}
+                        -
+                        {{ version.program.name }}
+                        v{{ version.version }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <div class="help">
+                Leave this as Standard Application to use
+                the existing underwriting flow.
+            </div>
+        </div>
+
+        <button
+            type="submit"
+            class="button primary">
+
+            Start Application
+
+        </button>
+    </form>
+
+</div>
+
+{% endblock %}

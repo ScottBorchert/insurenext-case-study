@@ -1,0 +1,188 @@
+{% extends "underwriting/base.html" %}
+
+{% block title %}
+Application {{ application.id }}
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>
+        Application {{ application.id }}
+    </h1>
+
+    <p>
+        <strong>Company:</strong>
+        {{ application.company.legal_name }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        <span class="status">
+            {{ application.status }}
+        </span>
+    </p>
+
+    <p>
+        <strong>Program:</strong>
+
+        {% if application.program_version %}
+            <span class="program">
+                {{ application.program_version }}
+            </span>
+        {% else %}
+            Standard Application
+        {% endif %}
+    </p>
+
+</div>
+
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="card">
+
+        <h2>Application Questions</h2>
+
+        {% for question in questions %}
+
+            <div class="field">
+
+                <label
+                    for="question_{{ question.question_id }}">
+
+                    {{ question.question_text }}
+
+                </label>
+
+                <div class="help">
+                    Key: {{ question.key }}
+
+                    {% if question.is_answer_locked %}
+                        <span class="locked">
+                            · Program default - locked
+                        </span>
+                    {% endif %}
+                </div>
+
+                {% if is_editable %}
+
+                    <input
+                        id="question_{{ question.question_id }}"
+                        name="question_{{ question.question_id }}"
+                        value="{{ question.answer|default_if_none:'' }}"
+                        {% if question.is_answer_locked %}
+                            readonly
+                        {% endif %}
+                    >
+
+                {% else %}
+
+                    <p>
+                        {{ question.answer|default:"-" }}
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Requested Coverages</h2>
+
+        {% for row in coverage_rows %}
+
+            <div class="coverage-row">
+
+                <input
+                    type="checkbox"
+                    name="coverage_{{ row.coverage.id }}"
+                    {% if row.selected %}checked{% endif %}
+                    {% if not is_editable %}disabled{% endif %}
+                >
+
+                <strong>
+                    {{ row.coverage.name }}
+                </strong>
+
+                <div>
+                    <label>
+                        Limit
+                    </label>
+
+                    <input
+                        name="coverage_{{ row.coverage.id }}_limit"
+                        value="{{ row.limit }}"
+                        placeholder="5000000"
+                        {% if not is_editable %}readonly{% endif %}
+                    >
+                </div>
+
+                <div>
+                    <label>
+                        Deductible
+                    </label>
+
+                    <input
+                        name="coverage_{{ row.coverage.id }}_deductible"
+                        value="{{ row.deductible }}"
+                        placeholder="25000"
+                        {% if not is_editable %}readonly{% endif %}
+                    >
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% if is_editable %}
+
+        <div class="button-row">
+
+            <button
+                type="submit"
+                name="action"
+                value="save"
+                class="button secondary">
+
+                Save Draft
+
+            </button>
+
+            <button
+                type="submit"
+                name="action"
+                value="submit"
+                class="button primary">
+
+                Submit Application
+
+            </button>
+
+        </div>
+
+    {% else %}
+
+        <a
+            class="button primary"
+            href="{% url 'underwriting:underwriting_review' application.id %}">
+
+            View Underwriting Review
+
+        </a>
+
+    {% endif %}
+
+</form>
+
+{% endblock %}

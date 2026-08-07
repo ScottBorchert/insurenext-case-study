@@ -1,0 +1,151 @@
+{% extends "underwriting/base.html" %}
+
+{% block title %}
+Underwriting Queue
+{% endblock %}
+
+{% block content %}
+
+<h1>Underwriting Queue</h1>
+
+
+<div class="card">
+
+    <h2>Submitted Applications</h2>
+
+    {% if submitted_applications %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Application</th>
+                    <th>Company</th>
+                    <th>Program</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for application in submitted_applications %}
+
+                <tr>
+                    <td>
+                        #{{ application.id }}
+                    </td>
+
+                    <td>
+                        {{ application.company.legal_name }}
+                    </td>
+
+                    <td>
+                        {% if application.program_version %}
+                            <span class="program">
+                                {{ application.program_version }}
+                            </span>
+                        {% else %}
+                            Standard
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <span class="status">
+                            {{ application.status }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <a
+                            class="button primary"
+                            href="{% url 'underwriting:underwriting_review' application.id %}">
+
+                            Review
+
+                        </a>
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    {% else %}
+
+        <p>
+            No applications are currently waiting
+            for underwriting.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<div class="card">
+
+    <h2>Recently Rated</h2>
+
+    {% if rated_applications %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Application</th>
+                    <th>Company</th>
+                    <th>Program</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for application in rated_applications %}
+
+                <tr>
+
+                    <td>
+                        #{{ application.id }}
+                    </td>
+
+                    <td>
+                        {{ application.company.legal_name }}
+                    </td>
+
+                    <td>
+                        {% if application.program_version %}
+                            {{ application.program_version }}
+                        {% else %}
+                            Standard
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <a
+                            class="button secondary"
+                            href="{% url 'underwriting:underwriting_review' application.id %}">
+
+                            View
+
+                        </a>
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    {% else %}
+
+        <p>
+            No rated applications yet.
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

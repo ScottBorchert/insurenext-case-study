@@ -84,21 +84,10 @@ def get_application_questions(application: Application,) -> list[dict]:
 
         if config is not None:
             if config.question_text_override:
-                question_text = (
-                    config.question_text_override
-                )
+                question_text = (config.question_text_override)
 
-            default_answer = (
-                config.default_answer_text
-            )
-
-            is_answer_locked = (
-                config.is_answer_locked
-            )
-
-            display_order = (
-                config.display_order
-            )
+            default_answer = (config.default_answer_text)
+            is_answer_locked = (config.is_answer_locked)
 
         answer = existing_answers.get(
             question.id

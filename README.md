@@ -2,25 +2,36 @@
 
 Django prototype for the InsureNext engineering case study.
 
-## Phase 1
+This project explores how InsureNext can support partner-specific insurance programs without duplicating rating engines or hardcoding partner logic.
 
-- Existing core insurance data model
-- Initial Django migration
-- Seed data
-- Rating request builder
-- Fake rating response
+## What Was Solved
 
-## Confirmed model details
+The existing platform already had:
 
-- `rating_engine_question_key` is the authoritative question key.
-- `ApplicationCoverage` belongs to an `Application`.
+- Applications
+- Rating engine versions
+- Application questions and answers
+- Coverage requests
+- Rating-engine integrations
 
-## Planned Phase 2
+The challenge was adding partner-specific customization while keeping the existing system reusable.
 
-- Distribution Partner
-- Program
-- Program Version
-- Question Definition
-- Program Question Configuration
-- Program Rating Configuration
-- Program Discount Configuration
+The solution is an optional `ProgramVersion` configuration layer that sits on top of the existing application and rating-engine model.
+
+## Architecture
+
+```text
+DistributionPartner
+        ↓
+      Program
+        ↓
+   ProgramVersion
+        │
+        ├── ProgramQuestionConfig
+        ├── ProgramRatingConfig
+        └── ProgramDiscountConfig
+        │
+        ↓
+    Application
+        ↓
+Existing Rating Engine

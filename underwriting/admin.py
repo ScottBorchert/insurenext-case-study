@@ -4,17 +4,15 @@ from .models import (
     Application,
     ApplicationAnswer,
     ApplicationCoverage,
-    ApplicationDiscount,
     ApplicationQuestion,
     Company,
     Coverage,
     DistributionPartner,
     Program,
-    ProgramCoverageConfig,
-    ProgramDiscountConfig,
-    ProgramQuestion,
-    ProgramRatingConfig,
     ProgramVersion,
+    ProgramDiscountConfig,
+    ProgramRatingConfig,
+    ProgramQuestionConfig,
     RatingEngineVersion,
 )
 
@@ -29,7 +27,6 @@ class CompanyAdmin(admin.ModelAdmin):
     )
     search_fields = ("legal_name", "dba_name")
 
-
 @admin.register(RatingEngineVersion)
 class RatingEngineVersionAdmin(admin.ModelAdmin):
     list_display = (
@@ -38,7 +35,6 @@ class RatingEngineVersionAdmin(admin.ModelAdmin):
         "effective_date",
         "endpoint_url",
     )
-
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
@@ -57,7 +53,6 @@ class ApplicationAdmin(admin.ModelAdmin):
         "rating_engine_version",
     )
 
-
 @admin.register(ApplicationQuestion)
 class ApplicationQuestionAdmin(admin.ModelAdmin):
     list_display = (
@@ -72,19 +67,16 @@ class ApplicationQuestionAdmin(admin.ModelAdmin):
         "is_pricing_modifier",
     )
 
-
 @admin.register(ApplicationAnswer)
 class ApplicationAnswerAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "application",
         "question",
-        "program_question",
         "answer_text",
     )
 
     list_filter = ("application__program_version",)
-
 
 @admin.register(ApplicationCoverage)
 class ApplicationCoverageAdmin(admin.ModelAdmin):
@@ -156,7 +148,6 @@ class ProgramAdmin(admin.ModelAdmin):
         "is_active",
     )
 
-
 @admin.register(ProgramVersion)
 class ProgramVersionAdmin(admin.ModelAdmin):
     list_display = (
@@ -175,29 +166,29 @@ class ProgramVersionAdmin(admin.ModelAdmin):
         "program__distribution_partner",
     )
 
-@admin.register(ProgramQuestion)
-class ProgramQuestionAdmin(admin.ModelAdmin):
+@admin.register(ProgramQuestionConfig)
+class ProgramQuestionConfigAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "question_key",
-        "question_text",
         "program_version",
-        "question_type",
-        "is_required",
+        "question",
+        "question_text_override",
+        "default_answer_text",
+        "is_answer_locked",
         "display_order",
         "is_active",
     )
 
-    search_fields = (
-        "question_key",
-        "question_text",
-    )
-
     list_filter = (
         "program_version",
-        "question_type",
-        "is_required",
+        "is_answer_locked",
         "is_active",
+    )
+
+    search_fields = (
+        "question__rating_engine_question_key",
+        "question__question_text",
+        "question_text_override",
     )
 
 @admin.register(ProgramRatingConfig)
@@ -205,16 +196,19 @@ class ProgramRatingConfigAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "program_version",
-        "rating_engine_key",
-        "value_source",
-        "source_question",
-        "is_required",
+        "config_key",
+        "config_value",
+        "is_active",
     )
 
     list_filter = (
         "program_version",
-        "value_source",
-        "is_required",
+        "is_active",
+    )
+
+    search_fields = (
+        "config_key",
+        "description",
     )
 
 @admin.register(ProgramDiscountConfig)
@@ -222,7 +216,7 @@ class ProgramDiscountConfigAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "program_version",
-        "code",
+        "question",
         "name",
         "discount_type",
         "application_type",
@@ -237,45 +231,4 @@ class ProgramDiscountConfigAdmin(admin.ModelAdmin):
         "application_type",
         "requires_approval",
         "is_active",
-    )
-
-@admin.register(ProgramCoverageConfig)
-class ProgramCoverageConfigAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "program_version",
-        "coverage",
-        "is_available",
-        "is_required",
-        "default_limit",
-        "default_deductible",
-    )
-
-    list_filter = (
-        "program_version",
-        "coverage",
-        "is_available",
-        "is_required",
-    )
-
-
-@admin.register(ApplicationDiscount)
-class ApplicationDiscountAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "application",
-        "discount_config",
-        "discount_value",
-        "created_at",
-    )
-
-    list_filter = (
-        "discount_config__program_version",
-        "discount_config",
-    )
-
-    search_fields = (
-        "application__company__legal_name",
-        "discount_config__name",
-        "discount_config__code",
     )

@@ -99,6 +99,12 @@ if os.environ.get("DB_HOST"):
                 "DB_PORT",
                 "5432",
             ),
+            "OPTIONS": {
+                "sslmode": os.environ.get(
+                    "DB_SSLMODE",
+                    "require",
+                ),
+            },
         }
     }
 else:

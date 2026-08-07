@@ -69,20 +69,82 @@ Application {{ application.id }}
 
                 {% if is_editable %}
 
-                    <input
-                        id="question_{{ question.question_id }}"
-                        name="question_{{ question.question_id }}"
-                        value="{{ question.answer|default_if_none:'' }}"
+                    {% if question.key == "prior_claims" %}
+
+                        <select
+                            id="question_{{ question.question_id }}"
+                            name="question_{{ question.question_id }}"
+                            {% if question.is_answer_locked %}
+                                disabled
+                            {% endif %}
+                        >
+
+                            <option value="">
+                                Select an answer
+                            </option>
+
+                            <option
+                                value="true"
+                                {% if question.answer == "true" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Yes
+                            </option>
+
+                            <option
+                                value="false"
+                                {% if question.answer == "false" %}
+                                    selected
+                                {% endif %}
+                            >
+                                No
+                            </option>
+
+                        </select>
+
                         {% if question.is_answer_locked %}
-                            readonly
+                            <input
+                                type="hidden"
+                                name="question_{{ question.question_id }}"
+                                value="{{ question.answer|default_if_none:'' }}"
+                            >
                         {% endif %}
-                    >
+
+                    {% else %}
+
+                        <input
+                            id="question_{{ question.question_id }}"
+                            name="question_{{ question.question_id }}"
+                            value="{{ question.answer|default_if_none:'' }}"
+                            {% if question.is_answer_locked %}
+                                readonly
+                            {% endif %}
+                        >
+
+                    {% endif %}
 
                 {% else %}
 
-                    <p>
-                        {{ question.answer|default:"-" }}
-                    </p>
+                    {% if question.key == "prior_claims" %}
+
+                        <p>
+                            {% if question.answer == "true" %}
+                                Yes
+                            {% elif question.answer == "false" %}
+                                No
+                            {% else %}
+                                -
+                            {% endif %}
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            {{ question.answer|default:"-" }}
+                        </p>
+
+                    {% endif %}
 
                 {% endif %}
 

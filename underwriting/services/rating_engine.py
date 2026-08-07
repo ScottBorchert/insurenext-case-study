@@ -4,7 +4,6 @@ from django.db import transaction
 
 from underwriting.models import Application
 
-
 def parse_answer(value: str):
     if value == "":
         return None
@@ -28,27 +27,83 @@ def parse_answer(value: str):
         return value
 
 
+def get_rating_engine_version(application: Application):
+    if application.program_version_id is not None:
+        return (
+            application
+            .program_version
+            .rating_engine_version
+        )
+
+    return application.rating_engine_version
+
+
+def get_rating_engine_version(application: Application):
+    if application.program_version_id is not None:
+        return (
+            application
+            .program_version
+            .rating_engine_version
+        )
+
+    return application.rating_engine_version
+
+
 def build_rating_request(application: Application) -> dict:
+
     answers = {}
     underwriter_discounts = {}
 
+    rating_engine_version = get_rating_engine_version(application)
+
     application_answers = application.answers.select_related(
-        "question"
+        "question",
+        "program_question",
     )
 
     for application_answer in application_answers:
-        question = application_answer.question
-        key = question.rating_engine_question_key
+        if application_answer.program_question_id is not None:
+            key = application_answer.program_question.question_key
 
-        if question.is_pricing_modifier:
-            underwriter_discounts[key] = float(
-                application_answer.answer_text
-            )
-        else:
             answers[key] = parse_answer(
                 application_answer.answer_text
             )
 
+            continue
+
+        question = application_answer.question
+        key = question.rating_engine_question_key
+
+        if question.is_pricing_modifier:
+            # Legacy discounts remain supported for standard,
+            # non-program applications.
+            if application.program_version_id is None:
+                underwriter_discounts[key] = float(
+                    application_answer.answer_text
+                )
+
+            continue
+
+        answers[key] = parse_answer(
+            application_answer.answer_text
+        )
+
+    application_discounts = application.discounts.select_related(
+        "discount_config"
+    )
+
+    for application_discount in application_discounts:
+        discount_config = application_discount.discount_config
+
+        key = (
+            discount_config.rating_engine_key
+            or discount_config.code
+        )
+
+        underwriter_discounts[key] = float(
+            application_discount.discount_value
+        )
+        
     coverages = []
 
     for application_coverage in application.coverages.select_related(
@@ -66,7 +121,7 @@ def build_rating_request(application: Application) -> dict:
         )
 
     return {
-        "version": application.rating_engine_version.version,
+        "version": rating_engine_version.version,
         "answers": answers,
         "coverages": coverages,
     }
